@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "node-powertools": "^2.1.5",
+    "systeminformation": "^5.25.11"
+  }
+}

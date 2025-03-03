@@ -1,5 +1,9 @@
 import express from 'express';
 import Provider from '../models/provider.js';
+import {
+  getBatteryStatus,
+  getSystemInfo,
+} from '../controllers/providerController.js'; // ✅ Import the function
 
 const router = express.Router();
 
@@ -36,4 +40,8 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Route to get battery percentage
+router.get('/battery', getBatteryStatus);
+// Route to get RAM & Storage Info Route
+router.get('/system-info', getSystemInfo);
 export default router;

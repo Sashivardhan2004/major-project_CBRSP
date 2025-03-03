@@ -8,10 +8,11 @@ import dockerRoutes from './routes/dockerRoutes.js';
 import logRoutes from './routes/logRoutes.js';
 import providerRoutes from './routes/providerRoutes.js';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 const app = express();
-expressWs(app);
+expressWs(app); // Enable WebSockets
 
 // Connect to MongoDB
 connectDB();
@@ -19,8 +20,8 @@ connectDB();
 // Middleware
 app.use(
   cors({
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific methods if needed
-    credentials: true, // Allow sending cookies with requests
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
   })
 );
 app.use(json());
@@ -39,6 +40,19 @@ app.use('/api/docker', dockerRoutes);
 app.use('/api/logs', logRoutes);
 app.use('/api/providers', providerRoutes);
 
-// app.use('ws:')
+// WebSocket support (if needed for real-time battery updates)
+app.ws('/api/providers/battery', (ws, req) => {
+  ws.send(JSON.stringify({ message: 'Battery WebSocket connected!' }));
+
+  setInterval(async () => {
+    try {
+      const battery = await import('node-powertools');
+      const batteryInfo = await battery.getBattery();
+      ws.send(JSON.stringify({ batteryPercentage: batteryInfo.percent }));
+    } catch (error) {
+      ws.send(JSON.stringify({ error: 'Error retrieving battery info' }));
+    }
+  }, 5000); // Send updates every 5 seconds
+});
 
 export default app;
